@@ -1,132 +1,79 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct Node
-{
-    int height;
-    struct Node *next;
-};
-
-// Function to create a new node
-struct Node *createNode(int height)
-{
-    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
-    newNode->height = height;
+typedef struct node {
+    int val;
+    struct node *next;
+} Node;
+void insertEnd(Node **head, int value) {
+    Node *newNode = (Node *)malloc(sizeof(Node));
+    newNode->val = value;
     newNode->next = NULL;
-    return newNode;
-}
 
-// Function to insert a node at the end of the list
-struct Node *insert(struct Node *head, int height)
-{
-    struct Node *newNode = createNode(height);
-    if (head == NULL)
-    {
-        return newNode; // If the list is empty, return new node as head
-    }
-
-    struct Node *current = head;
-    while (current->next != NULL)
-    {
-        current = current->next;
-    }
-    current->next = newNode; // Link the new node at the end
-    return head;
-}
-
-// Function to display the linked list
-void display(struct Node *head)
-{
-    printf("->");
-    while (head != NULL)
-    {
-        printf("%d->", head->height);
-        head = head->next;
-    }
-    printf("NULL\n");
-}
-
-// Function to merge two sorted linked lists
-struct Node *merge(struct Node *headA, struct Node *headB)
-{
-    struct Node *mergedHead = NULL;
-    struct Node **tail = &mergedHead; // Pointer to the last node in merged list
-
-    // Merge nodes from both lists
-    while (headA != NULL && headB != NULL)
-    {
-        struct Node *temp;
-        if (headA->height < headB->height)
-        {
-            temp = headA;
-            headA = headA->next; // Move to the next node in list A
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        Node *temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
         }
-        else
-        {
-            temp = headB;
-            headB = headB->next; // Move to the next node in list B
-        }
-
-        *tail = temp;            // Link the smaller node to the merged list
-        tail = &((*tail)->next); // Update tail to point to the new end of the merged list
+        temp->next = newNode;
     }
-
-    // Attach the remaining nodes of list A or B
-    if (headA != NULL)
-    {
-        *tail = headA;
+}
+void displayList(Node *head) {
+    Node *temp = head;
+    while (temp != NULL) {
+        printf("%d ", temp->val);
+        temp = temp->next;
     }
-    else
-    {
-        *tail = headB;
-    }
-
-    return mergedHead; // Return the head of the merged list
+    printf("\n");
 }
 
-int main()
-{
-    int N1, N2;
-
-    // Input the number of students in class A and B
-    scanf("%d %d", &N1, &N2);
-
-    struct Node *classA = NULL;
-    struct Node *classB = NULL;
-
-    // Input heights for class A
-    for (int i = 0; i < N1; i++)
-    {
-        int height;
-        scanf("%d", &height);
-        classA = insert(classA, height);
+// Function to merge two sorted linked lists into one sorted list
+Node* mergeLists(Node *list1, Node *list2) {
+    Node *mergedList = NULL, **lastPtrRef = &mergedList;
+    while (list1 != NULL && list2 != NULL) {
+        if (list1->val <= list2->val) {
+            *lastPtrRef = list1;
+            list1 = list1->next;
+        } else {
+            *lastPtrRef = list2;
+            list2 = list2->next;
+        }
+        lastPtrRef = &((*lastPtrRef)->next);
+    }
+    if (list1 != NULL) {
+        *lastPtrRef = list1;
+    } else if (list2 != NULL) {
+        *lastPtrRef = list2;
     }
 
-    // Input heights for class B
-    for (int i = 0; i < N2; i++)
-    {
-        int height;
-        scanf("%d", &height);
-        classB = insert(classB, height);
+    return mergedList;
+}
+
+int main() {
+    int n1, n2, i, value;
+    printf("Enter number of students in Class A and Class B: ");
+    scanf("%d %d", &n1, &n2);
+
+    Node *classA = NULL, *classB = NULL;
+    printf("Enter heights of students in Class A: ");
+    for (i = 0; i < n1; i++) {
+        scanf("%d", &value);
+        insertEnd(&classA, value);
     }
-
-    // Display Class A
-    printf("Class A\n");
-    display(classA);
-
-    // Display Class B
-    printf("Class B\n");
-    display(classB);
-
-    // Merge the two classes
-    struct Node *jointClass = merge(classA, classB);
-
-    // Display Joint Class
-    printf("Joint Class\n");
-    display(jointClass);
-
-    // Free the allocated memory (optional for cleanup)
-    // Add memory cleanup code here if necessary
+    printf("Enter heights of students in Class B: ");
+    for (i = 0; i < n2; i++) {
+        scanf("%d", &value);
+        insertEnd(&classB, value);
+    }
+    printf("Class A: ");
+    displayList(classA);
+    printf("Class B: ");
+    displayList(classB);
+    Node *mergedList = mergeLists(classA, classB);
+    printf("Merged Line: ");
+    displayList(mergedList);
 
     return 0;
 }
